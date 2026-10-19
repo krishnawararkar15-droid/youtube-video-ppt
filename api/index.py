@@ -1,6 +1,7 @@
 from flask import Flask, render_template_string, request, jsonify
 import sys
 import os
+import re
 from pathlib import Path
 
 app = Flask(__name__)
@@ -24,7 +25,7 @@ HTML_TEMPLATE = """
             min-height: 100vh;
         }
         .hero {
-            padding: 60px 0 30px;
+            padding: 50px 0 25px;
             text-align: center;
         }
         .brand-badge {
@@ -74,7 +75,7 @@ HTML_TEMPLATE = """
         .callout-info {
             background: rgba(59, 130, 246, 0.1);
             border-left: 4px solid #3b82f6;
-            padding: 1rem;
+            padding: 1.25rem;
             border-radius: 8px;
             margin-top: 1.5rem;
         }
@@ -135,7 +136,7 @@ HTML_TEMPLATE = """
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-gradient btn-lg">
-                                <i class="bi bi-play-circle me-2"></i>Analyze & Rebuild Slide Deck
+                                <i class="bi bi-play-circle me-2"></i>Analyze & Validate Video Stream
                             </button>
                         </div>
                     </form>
@@ -152,11 +153,11 @@ HTML_TEMPLATE = """
                     <!-- Cloud Hosting Recommendation Box -->
                     <div class="callout-info">
                         <div class="d-flex align-items-center mb-2">
-                            <span class="cloud-badge me-2">Recommended for 3+ Hour Lectures</span>
+                            <span class="cloud-badge me-2">Best for 3+ Hour Lectures</span>
                             <span class="fw-bold text-white">Streamlit Community Cloud</span>
                         </div>
                         <p class="small text-secondary mb-2">
-                            Serverless web hosts (like Vercel Hobby) enforce a strict <strong>10-second timeout</strong> on HTTP executions. For full 3-to-6+ hour video lectures, launch this repository on <strong>Streamlit Cloud</strong> (100% free with persistent background execution and full thumbnail review grid):
+                            Serverless hosts (like Vercel Hobby) enforce a strict <strong>10-second timeout</strong> on HTTP executions. For full 3-to-6+ hour video lectures with the live thumbnail review grid, run SlideGrab locally or deploy to <strong>Streamlit Cloud</strong> (100% free with persistent background execution):
                         </p>
                         <a href="https://share.streamlit.io/" target="_blank" class="btn btn-outline-info btn-sm">
                             <i class="bi bi-cloud-arrow-up me-1"></i>Open share.streamlit.io (Deploy in 1 Click)
@@ -211,13 +212,13 @@ HTML_TEMPLATE = """
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'ok') {
-                    statusText.innerHTML = "<strong>Validated:</strong> " + data.title + " (" + data.duration + "). Processing stream...";
+                    statusText.innerHTML = "<strong>Validated:</strong> " + data.title + " (" + data.duration + "). Ready for processing.";
                 } else {
                     statusText.innerText = "Notice: " + (data.message || "Video ready for local/cloud processing.");
                 }
             })
             .catch(err => {
-                statusText.innerText = "Link recorded. For full multi-hour processing, run via CLI or Streamlit Cloud.";
+                statusText.innerText = "Video stream recorded. For full multi-hour processing, run via CLI or Streamlit Cloud.";
             });
         }
     </script>
@@ -225,19 +226,12 @@ HTML_TEMPLATE = """
 </html>
 """
 
-@app.route("/")
-def home():
-    return render_template_string(HTML_TEMPLATE)
-
-@app.route("/api/check", methods=["POST"])
 def check_video():
     data = request.get_json(silent=True) or {}
     url = data.get("url", "")
     if not url:
         return jsonify({"status": "error", "message": "No URL provided"}), 400
     
-    # Fast lightweight validation without blocking serverless timeout
-    import re
     is_yt = bool(re.search(r'(youtube\.com|youtu\.be)', url, re.IGNORECASE))
     if not is_yt:
         return jsonify({"status": "error", "message": "Please provide a valid YouTube URL"}), 400
@@ -251,6 +245,14 @@ def check_video():
         "title": f"YouTube Lecture ({yt_id})",
         "duration": "Validated stream source"
     })
+
+# Catch-all routing: never returns 404 regardless of Vercel rewrites or paths
+@app.route("/", defaults={"path": ""}, methods=["GET", "POST"])
+@app.route("/<path:path>", methods=["GET", "POST"])
+def catch_all(path):
+    if path.endswith("check"):
+        return check_video()
+    return render_template_string(HTML_TEMPLATE)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
