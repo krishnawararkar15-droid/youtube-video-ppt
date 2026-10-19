@@ -1,6 +1,7 @@
 # SlideGrab Dependencies
 # Free, local, open-source slide reconstruction from lecture videos
 
+Flask>=3.0.0
 yt-dlp>=2024.0.0
 opencv-python>=4.6.0
 numpy>=1.23.0

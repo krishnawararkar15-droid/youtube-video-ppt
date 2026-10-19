@@ -52,11 +52,27 @@ pip install -r requirements.txt
 ## 🚀 Quick Usage
 
 ### Option A: Streamlit Web UI (Recommended for visual review)
-Launch the interactive web interface:
+Launch the interactive web interface locally:
 
 ```bash
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
+
+---
+
+## 🌐 Cloud Deployment
+
+### 1. Vercel Deployment
+This repository is configured for Vercel with `vercel.json` and a root `app.py` / `api/index.py` entrypoint.
+- Connect your GitHub repository (`youtube-video-ppt`) on [Vercel](https://vercel.com).
+- Click **Deploy**. Vercel will automatically build and host the SlideGrab web app.
+
+> **Note on Vercel**: Serverless functions on Vercel have a 10-second timeout. For processing 3+ hour video lectures in the cloud without local execution, use **Streamlit Community Cloud** below.
+
+### 2. Streamlit Community Cloud (100% Free, Persistent Compute)
+- Go to [share.streamlit.io](https://share.streamlit.io/).
+- Click **New App**, select your GitHub repository (`youtube-video-ppt`), set Main file path to `streamlit_app.py`, and click **Deploy**.
+- You will get a permanent public URL (e.g. `https://youtube-video-ppt.streamlit.app`) with persistent WebSocket support and full multi-hour video extraction.
 
 1. Paste your YouTube link (or local file path).
 2. Click **Preview Crop** to verify slide boundary detection.
