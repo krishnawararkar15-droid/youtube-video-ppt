@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 
 app = Flask(__name__)
+application = app
+handler = app
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
