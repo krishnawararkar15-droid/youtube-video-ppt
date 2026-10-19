@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+env/
+venv/
+ENV/
+
+# Caches and media
+cache/
+output/
+output_*/
+*.mp4
+*.mkv
+*.avi
+*.webm
+sample_frames/
+lecture_slides_extracted/
+test_out/
+slidext/
+
+# Presentation outputs and checkpoints
+*.pptx
+*.pdf
+checkpoint.json
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
